@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Biblioteca — Empréstimos</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="pagina/style.css">
+</head>
+<body>
+
+  <h2>Cadastro de Usuário</h2>
+  <form id="formUsuario" action="/cadastrar_usuario" method="POST">
+    <label>Nome</label>
+    <input type="text" name="nome" required>
+    <br>
+    <label>Email</label>
+    <input type="email" name="email" required>
+    <br>
+    <label>Telefone</label>
+    <input type="text" name="telefone">
+    <br>
+    <label>CPF</label>
+    <input type="text" name="cpf" id="cpf" oninput="mascaraCPF(this)" maxlength="14" required>
+    <br>
+    <label>Senha</label>
+    <input type="password" name="senha" required>
+    <br>
+    <button type="submit">Cadastrar Usuário</button>
+  </form>
+
+  <h2>Cadastro de Livro</h2>
+  <form id="formLivro" action="/cadastrar_livro" method="POST">
+    <label>Título</label>
+    <input type="text" name="titulo" required>
+    <br>
+    <label>Autor</label>
+    <input type="text" name="autor" required>
+    <br>
+    <label>ISBN</label>
+    <input type="text" name="isbn">
+    <br>
+    <label>Quantidade</label>
+    <input type="number" name="quantidade" value="1" min="1" required>
+    <br>
+    <button type="submit">Cadastrar Livro</button>
+  </form>
+
+  <h2>Solicitar Empréstimo</h2>
+  <form id="formEmprestimo" action="/emprestar" method="POST">
+    <label>Usuário</label>
+    <select name="usuario_id" required>
+      <option value="">-- selecione --</option>
+      {% for u in usuarios %}
+      <option value="{{ u.id }}">{{ u.nome }} — {{ u.email }}</option>
+      {% endfor %}
+    </select>
+    <br>
+    <label>Livro</label>
+    <select name="livro_id" required>
+      <option value="">-- selecione --</option>
+      {% for l in livros %}
+      <option value="{{ l.id }}">{{ l.titulo }} — {{ l.autor }} (Disponíveis: {{ l.disponiveis }})</option>
+      {% endfor %}
+    </select>
+    <br>
+    <label>Data prevista</label>
+    <input type="date" name="data_prevista" required>
+    <br>
+    <button type="submit">Solicitar Empréstimo</button>
+  </form>
+
+  <h2>Catálogo de Livros</h2>
+  <table border="1" cellpadding="6" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Autor</th>
+        <th>ISBN</th>
+        <th>Quantidade</th>
+        <th>Disponíveis</th>
+        <th>Estado</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for l in livros %}
+      <tr>
+        <td>{{ l.titulo }}</td>
+        <td>{{ l.autor }}</td>
+        <td>{{ l.isbn or '-' }}</td>
+        <td>{{ l.quantidade }}</td>
+        <td>{{ l.disponiveis }}</td>
+        <td>
+          {% if l.disponiveis > 0 %}
+            Disponível
+          {% else %}
+            Emprestado
+          {% endif %}
+        </td>
+        <td>
+          <form action="/devolver" method="POST" style="display:inline">
+            <input type="hidden" name="livro_id" value="{{ l.id }}">
+            <button type="submit">Devolver</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <script src="pagina/script.js"></script>
+</body>
+</html>
